@@ -1,6 +1,7 @@
 const Workout = require("../models/workoutmodel");
 const mongoose = require("mongoose");
-//getall workout model
+
+// get all workout model
 const getAllWorkout = async (req, res) => {
   try {
     const workouts = await Workout.find({}).sort({ createdAt: -1 });
@@ -11,7 +12,7 @@ const getAllWorkout = async (req, res) => {
   }
 };
 
-//getall single model
+// get a single workout model
 const getWorkout = async (req, res) => {
   try {
     const { id } = req.params;
@@ -33,7 +34,7 @@ const getWorkout = async (req, res) => {
   }
 };
 
-//create a new workout model
+// create a new workout model
 const createWorkout = async (req, res) => {
   const { title, load, reps } = req.body;
   try {
@@ -47,8 +48,59 @@ const createWorkout = async (req, res) => {
   }
 };
 
-//delete a new workout model
+// delete a new workout model
+const deleteWorkout = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-//update a new workout model
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Not a valid ID" });
+    }
 
-module.exports = { createWorkout, getAllWorkout, getWorkout };
+    const workout = await Workout.findByIdAndDelete(id);
+
+    if (!workout) {
+      return res.status(404).json({ error: "No such workout" });
+    }
+
+    res.json({ message: "Workout deleted successfully", workout });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+// update a new workout model
+const updateWorkout = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, load, reps } = req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Not a valid ID" });
+    }
+
+    const workout = await Workout.findOneAndUpdate(
+      { _id: id },
+      { ...req.body },
+      { new: true }
+    );
+
+    if (!workout) {
+      return res.status(404).json({ error: "No such workout" });
+    }
+
+    res.json({ message: "Workout updated successfully", workout });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+module.exports = {
+  createWorkout,
+  getAllWorkout,
+  getWorkout,
+  updateWorkout,
+  deleteWorkout,
+};
