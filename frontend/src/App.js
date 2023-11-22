@@ -4,7 +4,7 @@ import Home from "./pages/Home";
 import Navbar from "./components/Navbar";
 const App = () => {
   return (
-    <div className="APp">
+    <div className="APP">
       <BrowserRouter>
         <Navbar />
         <div className="pages">
